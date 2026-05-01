@@ -57,3 +57,7 @@ where = ["src"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --tb=short"
+pythonpath = ["src"]
+markers = [
+    "integration: marks tests as integration (requires real DB)"
+]
