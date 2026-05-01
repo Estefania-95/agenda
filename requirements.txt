@@ -1,0 +1,23 @@
+# Dependencias del Proyecto
+# Instalar con: pip install -r requirements.txt
+
+# Conexión a base de datos
+pyodbc>=4.0.39
+
+# Variables de entorno
+python-dotenv>=1.0.0
+
+# Testing (opcional para fases futuras)
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Exportación de datos (fase 3)
+pandas>=2.0.0
+openpyxl>=3.1.0  # Para XLSX
+
+# Interfaz CLI (fase 4)
+prompt-toolkit>=3.0.0
+rich>=13.0.0
+
+# Logging (ya viene con Python stdlib)
+# No requiere instalación

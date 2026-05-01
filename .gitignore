@@ -1,0 +1,39 @@
+# Archivos de entorno y secretos
+.env
+*.env
+venv/
+env/
+.venv/
+
+# Directorios de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Archivos de distribución / compilados
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+logs/
+*.log
+*.out
+
+# Tests y cobertura
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
