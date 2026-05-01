@@ -10,30 +10,29 @@ Sistema de Gestión Modular con SQL Server y Python. Metodología por fases estr
 - Cada fase tiene: spec.md (especificaciones) + progress.md (checklist)
 - Marcar tareas en progress.md al completarlas
 
-### 2. Fase 3 Actual (Estado: Implementando)
-**Objetivo**: Búsqueda avanzada y generación de reportes con exportación
+### 2. Fase 4 Actual (Estado: Completada en código, pendiente validación)
+**Objetivo**: Menú e Interfaz de Usuario CLI - LISTO PARA PROBAR
 
-**Archivos críticos**:
-- `src/buscador.py` - Funciones de búsqueda (YA CREADO)
-- `src/reportes.py` - Generación de reportes (YA CREADO)
-- `src/exportadores.py` - Exportación CSV/XLSX/PDF (YA CREADO)
-- `tests/test_*.py` - Tests unitarios Fase 3 (YA CREADOS)
+**Archivos críticos** (TODOS CREADOS):
+- `src/vistas.py` - Renderizado (tablas, menús, colores)
+- `src/formularios.py` - Formularios validados (alta, búsqueda, mod, elim, export)
+- `src/menu_principal.py` - Bucle principal y controladores
+- `main.py` - Punto de entrada principal
+- `menu_principal.py` - Script alternativo en raíz
 
-**Acciones pendientes Fase 3**:
-- [ ] Probar búsquedas con base de datos real
-- [ ] Probar reportes con datos reales
-- [ ] Probar exportación a CSV/XLSX/JSON
-- [ ] Ejecutar tests unitarios Fase 3
-- [ ] Verificar cobertura >80%
-- [ ] Documentar formatos de exportación
+**Acciones pendientes Fase 4**:
+- [ ] Probar interfaz con base de datos real
+- [ ] Verificar todos los flujos de usuario (alta, buscar, modificar, eliminar, reportes, exportar)
+- [ ] Validar que `rich` esté instalado (`pip install rich`)
+- [ ] Documentar atajos de teclado en README
+- [ ] Ejecutar tests unitarios Fases 1-3
+- [ ] Actualizar progress.md con validaciones manuales
 
 ### 3. Estructura de Commits
 ```
-feat: agregar búsqueda avanzada con filtros múltiples
-feat: agregar reportes estadísticos y de duplicados
-feat: agregar exportación CSV/XLSX/JSON/PDF
-test: agregar suite tests Fase 3 (32 tests)
-docs: actualizar README con ejemplos de reportes
+feat: agregar menú CLI con rich para Fase 4
+fix: corregir validación de fechas en formulario
+docs: actualizar README con pantallas y flujos
 ```
 
 ### 4. Código Python
@@ -82,9 +81,8 @@ pytest tests/ -v --integration
 ```
 
 ## Recordatorio
-**NO AVANZAR** a Fase 4 sin:
-- Búsquedas probadas con DB real
-- Reportes generando datos correctos
-- Exportación funcionando (CSV/XLSX)
-- Tests unitarios pasando (>80% cobertura)
-- Progress.md de Fase 3 actualizado
+**NO AVANZAR** a Fase 5 sin:
+- Menú probado con DB real
+- Flujo completo verificado (alta, buscar, modificar, eliminar, reportes, exportar)
+- Rich instalado y funcionando
+- Progress.md de Fase 4 actualizado

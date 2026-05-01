@@ -46,6 +46,11 @@ from src.exportadores import (
     validar_formato_archivo
 )
 
+# Fase 4: Interfaz de Usuario (para uso programático)
+from src.menu_principal import BuclePrincipal, PantallaAlta, PantallaBusqueda, PantallaModificacion, PantallaEliminacion, PantallaReportes, PantallaExportacion
+from src.formularios import formulario_alta_persona, formulario_busqueda, formulario_modificacion, formulario_confirmacion_eliminacion, formulario_exportacion
+from src.vistas import print_header, print_table, print_message, confirm, input_text, input_cuil, paginar_resultados
+
 __all__ = [
     # Database
     'conectar_db', 'test_connection', 'DatabaseConnectionError',
@@ -61,5 +66,12 @@ __all__ = [
     'reporte_estadisticas_generales', 'reporte_resumen_mensual', 'generar_reporte_completo',
     # Exportación
     'exportar_a_csv', 'exportar_a_xlsx', 'exportar_a_json', 'exportar_a_pdf',
-    'obtener_exportador', 'validar_formato_archivo'
+    'obtener_exportador', 'validar_formato_archivo',
+    # Interfaz - Fase 4
+    'BuclePrincipal', 'PantallaAlta', 'PantallaBusqueda', 'PantallaModificacion',
+    'PantallaEliminacion', 'PantallaReportes', 'PantallaExportacion',
+    'formulario_alta_persona', 'formulario_busqueda', 'formulario_modificacion',
+    'formulario_confirmacion_eliminacion', 'formulario_exportacion',
+    'print_header', 'print_table', 'print_message', 'confirm', 'input_text', 'input_cuil',
+    'paginar_resultados'
 ]

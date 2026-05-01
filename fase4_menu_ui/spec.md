@@ -44,14 +44,36 @@ Desarrollar interfaz de consola (CLI) para interacción del usuario.
 - Nombre/Apellido: solo letras y espacios, 2-100 caracteres
 - Evitar campos vacíos
 
-## Entregables
-1. Módulo `menu_principal.py` (main loop)
-2. Módulo `formularios.py` (inputs validados)
-3. Módulo `vistas.py` (renderizado de tablas/menús)
-4. Archivo `main.py` (punto de entrada)
+## Entregables Completados
+1. **Módulo `src/menu_principal.py`** - Bucle principal y controladores de pantalla
+2. **Módulo `src/formularios.py`** - Formularios validados para CRUD, búsqueda y exportación
+3. **Módulo `src/vistas.py`** - Renderizado de tablas, menús y componentes CLI
+4. **Archivos de entrada**:
+   - `main.py` - Punto de entrada principal
+   - `menu_principal.py` - Script alternativo de entrada
+
+## Funcionalidades Implementadas
+
+### Pantallas
+- **Alta de Persona** - formulario con validación CUIL, nombre, apellido
+- **Búsqueda** - filtros múltiples + resultados paginados
+- **Modificación** - selección por ID/CUIL + edición selectiva de campos
+- **Eliminación** - doble confirmación para seguridad
+- **Reportes** - menú con 4 tipos de reportes
+- **Exportación** - selector de formato (CSV/XLSX/JSON/PDF) con filtros opcionales
+
+### Librerías Utilizadas
+- `rich` - Tablas formateadas, colores, prompts, progreso
+- Fallback a stdlib si `rich` no disponible (modo consola simple)
+
+### Validaciones
+- CUIL: formato XX-XXXXXXXX-X con regex
+- Nombre/Apellido: 2-100 caracteres, solo letras
+- Fechas: formato YYYY-MM-DD
+- Números: enteros positivos
 
 ## Criterios de Éxito
-- [ ] Menú navegable con flujo completo
-- [ ] Validaciones funcionan
-- [ ] Interfaz clara y usable
-- [ ] Manejo de errores amigable
+- [x] Menú navegable con flujo completo
+- [x] Validaciones funcionan (tiempo real)
+- [x] Interfaz clara con tablas y colores
+- [x] Manejo de errores amigable

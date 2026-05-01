@@ -14,18 +14,49 @@ Sistema de gestión模块ar con SQL Server y Python, siguiendo metodología por 
 
 ```
 agenda/
+├── main.py                 # Punto de entrada principal (Fase 4)
+├── menu_principal.py       # Script alternativo (Fase 4)
 ├── src/
-│   └── database.py          # Módulo de conexión (Fase 1)
-├── fase1_db_infra/          # Infraestructura DB
-│   ├── spec.md              # Especificaciones técnicas
-│   ├── progress.md          # Checklist de tareas
-│   └── init_db.sql          # Script de inicialización
-├── fase2_crud_core/         # Operaciones CRUD
-├── fase3_busqueda_reportes/ # Búsqueda y reportes
-├── fase4_menu_ui/           # Interfaz CLI
-├── fase5_entrega_final/     # Empaquetado final
-├── .env.example             # Variables de entorno de ejemplo
-└── .gitignore               # Archivos ignorados por Git
+│   ├── __init__.py         # Exports de todas las fases
+│   ├── database.py         # Fase 1: Conexión SQL Server
+│   ├── crud_personas.py    # Fase 2: Operaciones CRUD
+│   ├── buscador.py         # Fase 3: Búsquedas avanzadas
+│   ├── reportes.py         # Fase 3: Reportes predefinidos
+│   ├── exportadores.py     # Fase 3: Exportación CSV/XLSX/JSON/PDF
+│   ├── menu_principal.py   # Fase 4: Bucle principal (src/)
+│   ├── formularios.py      # Fase 4: Formularios validados
+│   └── vistas.py           # Fase 4: Renderizado CLI
+├── fase1_db_infra/         # Infraestructura DB
+│   ├── spec.md
+│   ├── progress.md
+│   └── init_db.sql
+├── fase2_crud_core/        # CRUD Core
+│   ├── spec.md
+│   └── progress.md
+├── fase3_busqueda_reportes/ # Búsqueda y Reportes
+│   ├── spec.md
+│   └── progress.md
+├── fase4_menu_ui/          # Interfaz CLI
+│   ├── spec.md
+│   └── progress.md
+├── fase5_entrega_final/    # Entrega Final (pendiente)
+│   ├── spec.md
+│   └── progress.md
+├── tests/                  # Tests unitarios
+│   ├── test_database.py        (Fase 1)
+│   ├── test_crud_personas.py   (Fase 2)
+│   ├── test_buscador.py        (Fase 3)
+│   ├── test_reportes.py        (Fase 3)
+│   ├── test_exportadores.py    (Fase 3)
+│   └── conftest.py
+├── logs/                   # Logs operacionales
+├── .env.example            # Variables de entorno
+├── .gitignore
+├── AGENTS.md               # Instrucciones agentes Kilo
+├── COMMANDS.md             # Comandos útiles
+├── pyproject.toml          # Configuración empaquetado
+├── README.md               # Este archivo
+└── requirements.txt        # Dependencias
 ```
 
 ## Instalación Rápida
@@ -58,8 +89,10 @@ venv\Scripts\Activate.ps1
 # Linux/Mac:
 source venv/bin/activate
 
-# 4. Instalar dependencias
-pip install pyodbc python-dotenv
+# 4. Instalar dependencias básicas + CLI
+pip install -r requirements.txt
+# O instalar con extras:
+pip install -e ".[all]"
 
 # 5. Configurar variables de entorno
 cp .env.example .env
@@ -68,6 +101,9 @@ cp .env.example .env
 # 6. Inicializar base de datos
 # Ejecutar init_db.sql en SQL Server Management Studio o via sqlcmd:
 # sqlcmd -S localhost\SQLEXPRESS -i fase1_db_infra/init_db.sql
+
+# 7. Verificar instalación
+python main.py
 ```
 
 ## Configuración de Variables
@@ -101,12 +137,87 @@ Salida esperada:
 - **Fase 1**: Infraestructura SQL Server (completada)
 - **Fase 2**: CRUD Core (completada)
 - **Fase 3**: Búsqueda y Reportes (completada)
-- **Fase 4**: Menú e Interfaz de Usuario (implementando)
+- **Fase 4**: Menú e Interfaz de Usuario (completada)
 - **Fase 5**: Entrega Final (pendiente)
 
 Ver `faseX_*/spec.md` para detalles de cada fase.
 
-## Uso - Fase 3: Búsqueda y Reportes
+## Uso - Interfaz CLI (Fase 4)
+
+### Inicio de la Aplicación
+
+```bash
+# Opción 1: Ejecutar main.py (recomendado)
+python main.py
+
+# Opción 2: Ejecutar menu_principal.py
+python menu_principal.py
+
+# Opción 3: Usar módulo -m
+python -m src.menu_principal
+```
+
+### Flujo de Navegación
+
+```
+┌─ Menú Principal ──────────────────────┐
+│ 1. Alta de Persona                    │
+│ 2. Búsqueda de Personas               │
+│ 3. Modificación de Persona            │
+│ 4. Baja de Persona                    │
+│ 5. Reportes                           │
+│ 6. Exportar Datos                     │
+│ 0. Salir                              │
+└───────────────────────────────────────┘
+```
+
+### Pantallas de Reportes
+
+```
+┌─ Reportes ────────────────────────────┐
+│ 1. Estadísticas Generales             │
+│ 2. Personas por Rango de Fechas       │
+│ 3. Detectar DUPLICADOS de CUIL        │
+│ 4. Resumen Mensual                    │
+│ 0. Volver                             │
+└───────────────────────────────────────┘
+```
+
+### Características Visuales
+
+- **Colores**: Usa `rich` para tablas con colores y bordes redondeados
+- **Paginación**: Navegación con ← (anterior) y → (siguiente)
+- **Validación en tiempo real**: CUIL, fechas, longitud
+- **Confirmaciones**: Doble confirmación para eliminar
+- **Fallback modo simple**: Si `rich` no instalado, funciona en consola básica
+
+### Ejemplos de Uso
+
+**Alta de persona**:
+```
+Nombre: Juan Pérez
+Apellido: Pérez
+CUIL: 20-12345678-9
+¿Confirma? (s/N): s
+✓ Persona creada exitosamente.
+```
+
+**Búsqueda**:
+```
+Nombre (opcional): Juan
+Apellido (opcional): Pérez
+Límite (max 1000): 50
+→ Mostrando 1-10 de 15 resultados
+[prev] Página anterior | [next] Página siguiente | [back] Volver
+```
+
+**Exportación**:
+```
+Formato: csv
+Ruta de salida: personas.csv
+¿Aplicar filtros? (s/N): n
+✓ Exportación completada: 150 filas a 'personas.csv'
+```
 
 ### Búsquedas Avanzadas (Python REPL)
 
