@@ -99,12 +99,89 @@ Salida esperada:
 ## Desarrollo por Fases
 
 - **Fase 1**: Infraestructura SQL Server (completada)
-- **Fase 2**: CRUD Core (pendiente)
-- **Fase 3**: Búsqueda y Reportes (pendiente)
-- **Fase 4**: Menú e Interfaz de Usuario (pendiente)
+- **Fase 2**: CRUD Core (completada)
+- **Fase 3**: Búsqueda y Reportes (completada)
+- **Fase 4**: Menú e Interfaz de Usuario (implementando)
 - **Fase 5**: Entrega Final (pendiente)
 
 Ver `faseX_*/spec.md` para detalles de cada fase.
+
+## Uso - Fase 3: Búsqueda y Reportes
+
+### Búsquedas Avanzadas (Python REPL)
+
+```python
+from src.buscador import buscar_personas, buscar_por_cuil, busqueda_avanzada
+
+# Búsqueda con filtros y paginación
+resultados = buscar_personas(
+    nombre="Juan",
+    apellido=None,
+    cuil=None,
+    limit=50,
+    offset=0
+)
+print(f"Total encontrados: {resultados['total']}")
+print(f"Página: {resultados['pagina_actual']} de {resultados['total_paginas']}")
+
+# Búsqueda exacta por CUIL
+persona = buscar_por_cuil("20-12345678-9")
+
+# Búsqueda unificada (nombre, apellido o CUIL)
+coincidencias = busqueda_avanzada("Juan", buscar_en="ambos")
+```
+
+### Reportes (Python REPL)
+
+```python
+from src.reportes import reporte_personas_por_fecha, reporte_estadisticas_generales
+
+# Reporte por rango de fechas
+reporte = reporte_personas_por_fecha()
+print(f"Total últimos 30 días: {reporte['total']}")
+print(f"Promedio diario: {reporte['promedio_diario']}")
+for dia in reporte['por_dia']:
+    print(f"  {dia['fecha']}: {dia['cantidad']} registros")
+
+# Estadísticas generales
+stats = reporte_estadisticas_generales()
+print(f"Total absoluto: {stats['total']}")
+print(f"Primer registro: {stats['primer_registro']}")
+print(f"Top 10 apellidos: {stats['top_apellidos']}")
+```
+
+### Exportación de Datos
+
+```python
+from src.exportadores import exportar_a_csv, exportar_a_xlsx, obtener_exportador
+from src.buscador import buscar_personas
+
+# Obtener datos
+datos = buscar_personas(limit=100)['resultados']
+
+# Exportar formatos soportados
+exportar_a_csv(datos, "personas.csv")
+exportar_a_xlsx(datos, "personas.xlsx")
+exportar_a_json(datos, "personas.json")
+exportar_a_pdf(datos, "personas.pdf", titulo="Listado")
+
+# O usar factory
+exportador = obtener_exportador('xlsx')
+exportador(datos, "salida.xlsx")
+```
+
+### Tests de Fase 3
+
+```bash
+# Tests unitarios búsqueda y reportes
+pytest tests/test_buscador.py tests/test_reportes.py tests/test_exportadores.py -v
+
+# Tests de integración completos
+pytest tests/ -v --integration
+
+# Cobertura
+pytest tests/ --cov=src --cov-report=html
+```
 
 ## Troubleshooting
 
@@ -121,6 +198,20 @@ Ver `faseX_*/spec.md` para detalles de cada fase.
 - Verificar que SQL Server esté corriendo
 - Revisar firewall (puerto 1433)
 - Probar conexión con SQL Server Management Studio
+
+### Error: "ImportError: No module named 'pandas'"
+```bash
+pip install pandas openpyxl
+```
+
+### Error: "ImportError: No module named 'reportlab'"
+```bash
+pip install reportlab
+```
+
+### Error exportación PDF: UnicodeEncodeError
+- Instalar fuentes Unicode o configurar ReportLab
+- Verificar `reportlab.lib.fonts` cargando `Helvetica`
 
 ## Licencia
 

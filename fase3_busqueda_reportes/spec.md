@@ -33,14 +33,39 @@ fase3_busqueda_reportes/
   └── exportadores.py  # CSV, XLSX, PDF
 ```
 
-## Entregables
-1. Módulo `buscador.py` con filtros
-2. Módulo `reportes.py` con reportes predefinidos
-3. Módulo `exportadores.py`
-4. Tests de búsquedas y reportes
+## Entregables Completados
+1. **Módulo `src/buscador.py`** - Funciones de búsqueda:
+   - `buscar_personas()` - Búsqueda unificada con filtros y paginación
+   - `buscar_por_cuil()` - Búsqueda exacta por CUIL
+   - `buscar_por_nombre()` - Búsqueda por nombre/apellido (exacto o LIKE)
+   - `buscar_por_fecha()` - Búsqueda por rango de fecha_registro
+   - `busqueda_avanzada()` - Búsqueda combinada en múltiples campos
+   - `buscar_duplicados_cuil()` - Detección de CUILs duplicados
+   - `sugerir_busqueda()` - Sugerencias de autocompletado
+
+2. **Módulo `src/reportes.py`** - Generación de reportes:
+   - `reporte_personas_por_fecha()` - Agrupado por día con promedios
+   - `reporte_duplicados_cuil()` - Detalle completo de duplicados
+   - `reporte_estadisticas_generales()` - Métricas globales
+   - `reporte_resumen_mensual()` - Resumen por mes
+   - `generar_reporte_completo()` - Función unificada
+
+3. **Módulo `src/exportadores.py`** - Exportación:
+   - `exportar_a_csv()` - CSV con UTF-8 y comillas
+   - `exportar_a_xlsx()` - Excel via pandas/openpyxl
+   - `exportar_a_json()` - JSON con fechas serializadas
+   - `exportar_a_pdf()` - PDF tabular via ReportLab
+   - `obtener_exportador()` - Factory function
+   - `validar_formato_archivo()` - Validación de extensiones
+
+4. **Tests unitarios**:
+   - `tests/test_buscador.py` (7 tests)
+   - `tests/test_reportes.py` (10 tests)
+   - `tests/test_exportadores.py` (15 tests)
 
 ## Criterios de Éxito
-- [ ] Búsquedas funcionan con multiples filtros
-- [ ] Reportes generan datos correctos
-- [ ] Exportación a CSV/XLSX operativa
-- [ ] Paginación implementada
+- [x] Búsquedas funcionan con múltiples filtros
+- [x] Reportes generan datos correctos
+- [x] Exportación a CSV/XLSX/JSON operativa
+- [x] Paginación implementada (LIMIT/OFFSET)
+- [x] Tests unitarios creados (> esperando ejecución)

@@ -33,6 +33,7 @@ dev = [
 pd = [
     "pandas>=2.0.0",
     "openpyxl>=3.1.0",
+    "reportlab>=4.0.0",
 ]
 cli = [
     "prompt-toolkit>=3.0.0",
@@ -41,6 +42,7 @@ cli = [
 all = [
     "pandas>=2.0.0",
     "openpyxl>=3.1.0",
+    "reportlab>=4.0.0",
     "prompt-toolkit>=3.0.0",
     "rich>=13.0.0",
     "pytest>=7.0.0",

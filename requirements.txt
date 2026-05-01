@@ -14,6 +14,7 @@ pytest-cov>=4.0.0
 # Exportación de datos (fase 3)
 pandas>=2.0.0
 openpyxl>=3.1.0  # Para XLSX
+reportlab>=4.0.0  # Para PDF
 
 # Interfaz CLI (fase 4)
 prompt-toolkit>=3.0.0

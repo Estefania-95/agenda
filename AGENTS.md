@@ -10,26 +10,30 @@ Sistema de Gestión Modular con SQL Server y Python. Metodología por fases estr
 - Cada fase tiene: spec.md (especificaciones) + progress.md (checklist)
 - Marcar tareas en progress.md al completarlas
 
-### 2. Fase 2 Actual (Estado: Implementando)
-**Objetivo**: Operaciones CRUD con validaciones y transacciones
+### 2. Fase 3 Actual (Estado: Implementando)
+**Objetivo**: Búsqueda avanzada y generación de reportes con exportación
 
 **Archivos críticos**:
-- `src/crud_personas.py` - Módulo CRUD (YA CREADO)
-- `tests/test_crud_personas.py` - Tests unitarios (YA CREADO)
-- `src/database.py` - Dependencia Fase 1
+- `src/buscador.py` - Funciones de búsqueda (YA CREADO)
+- `src/reportes.py` - Generación de reportes (YA CREADO)
+- `src/exportadores.py` - Exportación CSV/XLSX/PDF (YA CREADO)
+- `tests/test_*.py` - Tests unitarios Fase 3 (YA CREADOS)
 
-**Acciones pendientes Fase 2**:
-- [ ] Probar funciones CRUD con base de datos real
-- [ ] Ejecutar suite de tests unitarios
-- [ ] Asegurar cobertura >80%
-- [ ] Documentar uso del módulo CRUD
+**Acciones pendientes Fase 3**:
+- [ ] Probar búsquedas con base de datos real
+- [ ] Probar reportes con datos reales
+- [ ] Probar exportación a CSV/XLSX/JSON
+- [ ] Ejecutar tests unitarios Fase 3
+- [ ] Verificar cobertura >80%
+- [ ] Documentar formatos de exportación
 
 ### 3. Estructura de Commits
 ```
-feat: agregar operaciones CRUD con validaciones
-fix: corregir manejo de transacciones en actualizar
-test: aumentar cobertura test CRUD al 90%
-docs: agregar guía instalación Fase 2
+feat: agregar búsqueda avanzada con filtros múltiples
+feat: agregar reportes estadísticos y de duplicados
+feat: agregar exportación CSV/XLSX/JSON/PDF
+test: agregar suite tests Fase 3 (32 tests)
+docs: actualizar README con ejemplos de reportes
 ```
 
 ### 4. Código Python
@@ -78,9 +82,9 @@ pytest tests/ -v --integration
 ```
 
 ## Recordatorio
-**NO AVANZAR** a Fase 3 sin:
-- CRUD probado en base de datos real
+**NO AVANZAR** a Fase 4 sin:
+- Búsquedas probadas con DB real
+- Reportes generando datos correctos
+- Exportación funcionando (CSV/XLSX)
 - Tests unitarios pasando (>80% cobertura)
-- Validacionesimplementadas y testeadas
-- Logging operacional funcionando
-- Progress.md actualizado
+- Progress.md de Fase 3 actualizado
