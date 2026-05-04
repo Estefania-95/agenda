@@ -5,6 +5,7 @@ Pruebas de generación de reportes y estadísticas.
 
 import sys
 import os
+import pytest
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 

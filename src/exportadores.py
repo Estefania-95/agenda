@@ -5,11 +5,23 @@ Fase 3: Búsqueda y Reportes - Exportación a CSV/XLSX/JSON/PDF.
 
 import csv
 import json
+import sys
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
 # Módulos propios
 from src.database import DatabaseConnectionError
+
+# Placeholders para permitir patching en tests (sin importar librerías pesadas al cargar el módulo)
+pandas = None  # será un módulo cuando esté disponible
+SimpleDocTemplate = None
+Table = None
+TableStyle = None
+Paragraph = None
+Spacer = None
+letter = None
+colors = None
+getSampleStyleSheet = None
 
 
 def exportar_a_csv(
@@ -79,19 +91,30 @@ def exportar_a_xlsx(
         ImportError: Si pandas no está instalado.
         IOError: Si no se puede escribir el archivo.
     """
-    try:
-        import pandas as pd
-    except ImportError:
+    global pandas
+    # Si el import está explícitamente “cortado” (tests), debe fallar aunque
+    # hayamos cacheado el módulo antes.
+    if sys.modules.get('pandas', object()) is None:
         raise ImportError(
             "Pandas es requerido para exportar XLSX. "
             "Instalar con: pip install pandas openpyxl"
         )
+    if pandas is None:
+        try:
+            # Lazy import para soportar entornos sin pandas.
+            import pandas as pd  # type: ignore
+            pandas = pd
+        except Exception:
+            raise ImportError(
+                "Pandas es requerido para exportar XLSX. "
+                "Instalar con: pip install pandas openpyxl"
+            )
 
     if not datos:
         raise ValueError("No hay datos para exportar")
 
     # Convertir a DataFrame
-    df = pd.DataFrame(datos)
+    df = pandas.DataFrame(datos)  # type: ignore[union-attr]
 
     # Renombrar cabeceras si se proporcionan
     if cabeceras_personalizadas:
@@ -100,7 +123,7 @@ def exportar_a_xlsx(
     # Formatear columnas de fecha
     for col in df.columns:
         if df[col].dtype == 'datetime64[ns]' or col.lower().endswith('fecha'):
-            df[col] = pd.to_datetime(df[col], errors='coerce').dt.strftime('%Y-%m-%d %H:%M:%S')
+            df[col] = pandas.to_datetime(df[col], errors='coerce').dt.strftime('%Y-%m-%d %H:%M:%S')  # type: ignore[union-attr]
 
     try:
         df.to_excel(
@@ -109,7 +132,7 @@ def exportar_a_xlsx(
             index=False,
             engine='openpyxl'
         )
-        return len(df)
+        return len(datos)
     except Exception as e:
         raise IOError(f"Error al exportar XLSX: {e}") from e
 
@@ -181,23 +204,44 @@ def exportar_a_pdf(
         ImportError: Si reportlab no está instalado.
         IOError: Si no se puede escribir el archivo.
     """
-    try:
-        from reportlab.lib.pagesizes import letter
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-        from reportlab.lib import colors
-        from reportlab.lib.styles import getSampleStyleSheet
-    except ImportError:
+    global SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, letter, colors, getSampleStyleSheet
+    if sys.modules.get('reportlab', object()) is None:
         raise ImportError(
             "ReportLab es requerido para exportar PDF. "
             "Instalar con: pip install reportlab"
         )
+    if SimpleDocTemplate is None or Table is None or Paragraph is None:
+        try:
+            # Lazy import para soportar entornos sin reportlab.
+            from reportlab.lib.pagesizes import letter as _letter
+            from reportlab.platypus import SimpleDocTemplate as _SimpleDocTemplate, Table as _Table, TableStyle as _TableStyle, Paragraph as _Paragraph, Spacer as _Spacer
+            from reportlab.lib import colors as _colors
+            from reportlab.lib.styles import getSampleStyleSheet as _getSampleStyleSheet
+
+            letter = _letter
+            SimpleDocTemplate = _SimpleDocTemplate
+            Table = _Table
+            TableStyle = _TableStyle
+            Paragraph = _Paragraph
+            Spacer = _Spacer
+            colors = _colors
+            getSampleStyleSheet = _getSampleStyleSheet
+        except ImportError:
+            raise ImportError(
+                "ReportLab es requerido para exportar PDF. "
+                "Instalar con: pip install reportlab"
+            )
 
     if not datos:
         raise ValueError("No hay datos para exportar")
 
     try:
-        doc = SimpleDocTemplate(ruta_archivo, pagesize=letter)
-        styles = getSampleStyleSheet()
+        doc = SimpleDocTemplate(ruta_archivo, pagesize=letter)  # type: ignore[misc]
+        if getSampleStyleSheet is not None:
+            styles = getSampleStyleSheet()  # type: ignore[misc]
+        else:
+            # En tests se parchea Paragraph; no necesitamos estilos reales.
+            styles = {'Title': None, 'Normal': None}
         story = []
 
         # Cabecera
@@ -207,7 +251,8 @@ def exportar_a_pdf(
                 f"Generado: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
                 styles['Normal']
             ))
-            story.append(Spacer(1, 12))
+            if Spacer is not None:
+                story.append(Spacer(1, 12))  # type: ignore[misc]
 
         # Preparar datos de tabla
         cabeceras = list(datos[0].keys())
@@ -223,17 +268,19 @@ def exportar_a_pdf(
             tabla_datos.append(fila_formateada)
 
         # Crear tabla
-        tabla = Table(tabla_datos)
-        tabla.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
+        tabla = Table(tabla_datos)  # type: ignore[misc]
+        # En tests se parchea Table/TableStyle y a veces no se provee `colors`.
+        if TableStyle is not None and colors is not None:
+            tabla.setStyle(TableStyle([  # type: ignore[misc]
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # type: ignore[union-attr]
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # type: ignore[union-attr]
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # type: ignore[union-attr]
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)  # type: ignore[union-attr]
+            ]))
 
         story.append(tabla)
         doc.build(story)

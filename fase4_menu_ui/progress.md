@@ -1,19 +1,19 @@
 # Checklist de Tareas - Fase 4: Menú e Interfaz de Usuario
 
 ## Tareas Pendientes
-- [ ] Evaluar librería CLI (prompt_toolkit vs curses)
-- [ ] Instalar dependencias CLI elegidas
-- [ ] Diseñar estructura de menús
-- [ ] Implementar menú principal
-- [ ] Implementar formulario de alta
-- [ ] Implementar pantalla de búsqueda
-- [ ] Implementar pantalla de modificación
-- [ ] Implementar pantalla de baja con confirmación
-- [ ] Implementar pantalla de reportes
-- [ ] Implementar pantalla de exportación
-- [ ] Agregar validaciones de entrada
+- [x] Evaluar librería CLI (prompt_toolkit vs curses)
+- [x] Instalar dependencias CLI elegidas
+- [x] Diseñar estructura de menús
+- [x] Implementar menú principal
+- [x] Implementar formulario de alta
+- [x] Implementar pantalla de búsqueda
+- [x] Implementar pantalla de modificación
+- [x] Implementar pantalla de baja con confirmación
+- [x] Implementar pantalla de reportes
+- [x] Implementar pantalla de exportación
+- [x] Agregar validaciones de entrada
 - [ ] Testear flujo completo
-- [ ] Documentar uso del menú
+- [x] Documentar uso del menú
 
 ## Tareas Completadas
 - [x] Crear spec.md de fase 4

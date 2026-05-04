@@ -1,0 +1,157 @@
+.main {
+  min-height: 100vh;
+  padding: 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.statsRow {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.statsRow :global(.card) {
+  padding: 1.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.5rem;
+}
+
+.statValue {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--accent-light);
+}
+
+.statValueSmall {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Search Section */
+.searchSection {
+  margin-bottom: 2rem;
+}
+
+.searchSection form {
+  display: flex;
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  color: white;
+  font-size: 1.1rem;
+  outline: none;
+}
+
+.searchButton {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.searchButton:hover {
+  background: var(--accent-light);
+  transform: translateY(-2px);
+}
+
+/* Table Styles */
+.tableWrapper {
+  padding: 1rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 1.25rem 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table td {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.name {
+  font-weight: 600;
+  color: white;
+}
+
+.cuil {
+  background: rgba(99, 102, 241, 0.1);
+  color: #a5b4fc;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btnEdit, .btnDelete {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnEdit:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btnDelete:hover {
+  background: var(--error);
+  border-color: var(--error);
+}
+
+.centered {
+  text-align: center;
+  padding: 4rem;
+  color: rgba(255, 255, 255, 0.3);
+}

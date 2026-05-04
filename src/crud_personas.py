@@ -129,30 +129,41 @@ def crear_persona(nombre: str, apellido: str, cuil: str) -> bool:
         VALUES (?, ?, ?)
     """
 
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
+        # No usar context manager: facilita mocking en unit tests.
+        conn = conectar_db()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(query, (nombre, apellido, cuil))
+            conn.commit()
+
+            logger.info(
+                f"Persona creada: {nombre} {apellido}, CUIL: {cuil}"
+            )
+            return True
+
+        except pyodbc.IntegrityError as e:
             try:
-                cursor.execute(query, (nombre, apellido, cuil))
-                conn.commit()
-
-                logger.info(
-                    f"Persona creada: {nombre} {apellido}, CUIL: {cuil}"
-                )
-                return True
-
-            except pyodbc.IntegrityError as e:
                 conn.rollback()
-                # Verificar si es violación de UNIQUE (CUIL duplicado)
-                if 'UNIQUE' in str(e).upper() or 'DUPLICATE' in str(e).upper():
-                    raise DuplicadoError(
-                        f"Ya existe una persona con CUIL '{cuil}'."
-                    ) from e
-                raise
+            except Exception:
+                pass
+            # Verificar si es violación de UNIQUE (CUIL duplicado)
+            if 'UNIQUE' in str(e).upper() or 'DUPLICATE' in str(e).upper():
+                raise DuplicadoError(
+                    f"Ya existe una persona con CUIL '{cuil}'."
+                ) from e
+            raise
 
     except pyodbc.Error as e:
         logger.error(f"Error DB al crear persona: {e}")
         raise DatabaseConnectionError(f"Error de base de datos: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def obtener_persona(persona_id: int) -> Optional[Dict[str, Any]]:
@@ -174,21 +185,32 @@ def obtener_persona(persona_id: int) -> Optional[Dict[str, Any]]:
         WHERE id = ?
     """
 
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, (persona_id,))
-            row = cursor.fetchone()
+        conn = conectar_db()
+        cursor = conn.cursor()
+        cursor.execute(query, (persona_id,))
+        row = cursor.fetchone()
 
-            if row:
-                columns = [column[0] for column in cursor.description]
-                return dict(zip(columns, row))
+        if row:
+            desc = getattr(cursor, "description", None)
+            if isinstance(desc, (list, tuple)) and desc:
+                columns = [column[0] for column in desc]
+            else:
+                columns = ['id', 'nombre', 'apellido', 'cuil', 'fecha_registro']
+            return dict(zip(columns, row))
 
-            return None
+        return None
 
     except pyodbc.Error as e:
         logger.error(f"Error DB al obtener persona id={persona_id}: {e}")
         raise DatabaseConnectionError(f"Error de base de datos: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def actualizar_persona(persona_id: int, **datos: Any) -> bool:
@@ -232,32 +254,42 @@ def actualizar_persona(persona_id: int, **datos: Any) -> bool:
 
     params = list(datos_filtrados.values()) + [persona_id]
 
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
+        conn = conectar_db()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(query, tuple(params))
+            conn.commit()
+
+            if cursor.rowcount == 0:
+                return False  # No se encontró la persona
+
+            logger.info(
+                f"Persona actualizada id={persona_id}, campos: {list(datos_filtrados.keys())}"
+            )
+            return True
+
+        except pyodbc.IntegrityError as e:
             try:
-                cursor.execute(query, tuple(params))
-                conn.commit()
-
-                if cursor.rowcount == 0:
-                    return False  # No se encontró la persona
-
-                logger.info(
-                    f"Persona actualizada id={persona_id}, campos: {list(datos_filtrados.keys())}"
-                )
-                return True
-
-            except pyodbc.IntegrityError as e:
                 conn.rollback()
-                if 'UNIQUE' in str(e).upper() or 'DUPLICATE' in str(e).upper():
-                    raise DuplicadoError(
-                        f"El CUIL '{datos_filtrados.get('cuil')}' ya existe en otro registro."
-                    ) from e
-                raise
+            except Exception:
+                pass
+            if 'UNIQUE' in str(e).upper() or 'DUPLICATE' in str(e).upper():
+                raise DuplicadoError(
+                    f"El CUIL '{datos_filtrados.get('cuil')}' ya existe en otro registro."
+                ) from e
+            raise
 
     except pyodbc.Error as e:
         logger.error(f"Error DB al actualizar persona id={persona_id}: {e}")
         raise DatabaseConnectionError(f"Error de base de datos: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def eliminar_persona(persona_id: int) -> bool:
@@ -275,22 +307,29 @@ def eliminar_persona(persona_id: int) -> bool:
 
     query = "DELETE FROM Personas WHERE id = ?"
 
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, (persona_id,))
-            conn.commit()
+        conn = conectar_db()
+        cursor = conn.cursor()
+        cursor.execute(query, (persona_id,))
+        conn.commit()
 
-            if cursor.rowcount == 0:
-                logger.warning(f"Intento de eliminar persona inexistente id={persona_id}")
-                return False
+        if cursor.rowcount == 0:
+            logger.warning(f"Intento de eliminar persona inexistente id={persona_id}")
+            return False
 
-            logger.info(f"Persona eliminada id={persona_id}")
-            return True
+        logger.info(f"Persona eliminada id={persona_id}")
+        return True
 
     except pyodbc.Error as e:
         logger.error(f"Error DB al eliminar persona id={persona_id}: {e}")
         raise DatabaseConnectionError(f"Error de base de datos: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def listar_personas(
@@ -350,24 +389,31 @@ def listar_personas(
     base_query += " ORDER BY apellido, nombre, id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
     params.extend([offset, limit])
 
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute(base_query, tuple(params))
-            rows = cursor.fetchall()
+        conn = conectar_db()
+        cursor = conn.cursor()
+        cursor.execute(base_query, tuple(params))
+        rows = cursor.fetchall()
 
-            columns = [column[0] for column in cursor.description]
-            resultados = [dict(zip(columns, row)) for row in rows]
+        columns = [column[0] for column in cursor.description]
+        resultados = [dict(zip(columns, row)) for row in rows]
 
-            logger.info(
-                f"Listado personas: filtros={dict(nombre=nombre, apellido=apellido, cuil=cuil)}, "
-                f"total_encontrado={len(resultados)}"
-            )
-            return resultados
+        logger.info(
+            f"Listado personas: filtros={dict(nombre=nombre, apellido=apellido, cuil=cuil)}, "
+            f"total_encontrado={len(resultados)}"
+        )
+        return resultados
 
     except pyodbc.Error as e:
         logger.error(f"Error DB al listar personas: {e}")
         raise DatabaseConnectionError(f"Error de base de datos: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def contar_personas(
@@ -399,13 +445,20 @@ def contar_personas(
         base_query += " AND cuil = ?"
         params.append(cuil.strip())
 
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute(base_query, tuple(params))
-            count = cursor.fetchone()[0]
-            return count
+        conn = conectar_db()
+        cursor = conn.cursor()
+        cursor.execute(base_query, tuple(params))
+        row = cursor.fetchone()
+        return row[0] if row else 0
 
     except pyodbc.Error as e:
         logger.error(f"Error DB al contar personas: {e}")
         raise DatabaseConnectionError(f"Error de base de datos: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass

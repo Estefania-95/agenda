@@ -12,7 +12,7 @@ from datetime import datetime
 import pyodbc
 from dotenv import load_dotenv
 
-# Cargar variables de entorno desde .env
+# Cargar variables de entorno desde .env (se puede mockear en tests)
 load_dotenv()
 
 
@@ -111,25 +111,37 @@ def test_connection() -> dict:
     Raises:
         DatabaseConnectionError: Si la prueba falla.
     """
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
+        # No usar context manager: simplifica mocking en unit tests.
+        conn = conectar_db()
+        cursor = conn.cursor()
 
-            # Consulta simple para verificar conectividad
-            cursor.execute("SELECT @@VERSION AS Version")
-            row = cursor.fetchone()
+        # Consulta simple para verificar conectividad
+        cursor.execute("SELECT @@VERSION AS Version")
+        row = cursor.fetchone()
 
-            if row:
-                return {
-                    'success': True,
-                    'timestamp': datetime.now().isoformat(),
-                    'sql_server_version': row.Version.strip(),
-                    'message': 'Conexión exitosa a SQL Server'
-                }
+        if row:
+            # pyodbc puede devolver Row con atributo .Version,
+            # pero en tests a veces se mockea como lista/tupla.
+            version_value = None
+            if hasattr(row, "Version"):
+                version_value = row.Version
+            elif isinstance(row, (list, tuple)) and row:
+                version_value = row[0]
             else:
-                raise DatabaseConnectionError(
-                    "Conexión establecida pero la consulta no retornó resultados."
-                )
+                version_value = str(row)
+
+            return {
+                'success': True,
+                'timestamp': datetime.now().isoformat(),
+                'sql_server_version': str(version_value).strip(),
+                'message': 'Conexión exitosa a SQL Server'
+            }
+
+        raise DatabaseConnectionError(
+            "Conexión establecida pero la consulta no retornó resultados."
+        )
 
     except DatabaseConnectionError:
         # Re-lanzar sin modificar
@@ -138,6 +150,12 @@ def test_connection() -> dict:
         raise DatabaseConnectionError(
             f"Error durante prueba de conexión: {str(e)}"
         ) from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def ejecutar_query(query: str, params: Optional[tuple] = None) -> list:
@@ -151,24 +169,31 @@ def ejecutar_query(query: str, params: Optional[tuple] = None) -> list:
     Returns:
         list: Lista de filas resultantes.
     """
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
-            if params:
-                cursor.execute(query, params)
-            else:
-                cursor.execute(query)
+        conn = conectar_db()
+        cursor = conn.cursor()
+        if params is not None:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
 
-            # Obtener todas las filas
-            columns = [column[0] for column in cursor.description]
-            results = []
-            for row in cursor.fetchall():
-                results.append(dict(zip(columns, row)))
+        # Obtener todas las filas
+        columns = [column[0] for column in cursor.description]
+        results = []
+        for row in cursor.fetchall():
+            results.append(dict(zip(columns, row)))
 
-            return results
+        return results
 
     except pyodbc.Error as e:
         raise DatabaseConnectionError(f"Error en consulta: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def ejecutar_non_query(query: str, params: Optional[tuple] = None) -> int:
@@ -182,20 +207,31 @@ def ejecutar_non_query(query: str, params: Optional[tuple] = None) -> int:
     Returns:
         int: Número de filas afectadas.
     """
+    conn = None
     try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
-            if params:
-                cursor.execute(query, params)
-            else:
-                cursor.execute(query)
+        conn = conectar_db()
+        cursor = conn.cursor()
+        if params is not None:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
 
-            conn.commit()
-            return cursor.rowcount
+        conn.commit()
+        return cursor.rowcount
 
     except pyodbc.Error as e:
-        conn.rollback()
+        try:
+            if conn is not None:
+                conn.rollback()
+        except Exception:
+            pass
         raise DatabaseConnectionError(f"Error en operación: {e}") from e
+    finally:
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 # ==============================================
@@ -208,14 +244,15 @@ if __name__ == "__main__":
 
     try:
         result = test_connection()
-        print(f"✓ Estado: {result['success']}")
-        print(f"✓ Mensaje: {result['message']}")
-        print(f"✓ Timestamp: {result['timestamp']}")
-        print(f"✓ SQL Server: {result['sql_server_version'][:80]}...")
-        print("\n¡Conexión exitosa!")
+        # Evitar caracteres Unicode que rompen consolas cp1252
+        print(f"[OK] Estado: {result['success']}")
+        print(f"[OK] Mensaje: {result['message']}")
+        print(f"[OK] Timestamp: {result['timestamp']}")
+        print(f"[OK] SQL Server: {result['sql_server_version'][:80]}...")
+        print("\nConexion exitosa!")
 
     except DatabaseConnectionError as e:
-        print(f"✗ ERROR: {e}")
+        print(f"[ERROR] {e}")
         print("\nRevise:")
         print("  1. Que el archivo .env exista con los valores correctos")
         print("  2. Que SQL Server esté corriendo")
@@ -224,5 +261,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     except Exception as e:
-        print(f"✗ ERROR INESPERADO: {e}")
+        print(f"[ERROR] INESPERADO: {e}")
         sys.exit(1)

@@ -21,10 +21,10 @@ Consolidar el proyecto, empaquetar y preparar para despliegue.
 - `ARCHITECTURE.md` con diagrama de módulos
 
 ### Scripts de Utilidad
-- `scripts/init_db.py` – levantar base de datos
-- `scripts/backup.py` – backup de datos
-- `scripts/restore.py` – restore desde backup
-- `scripts/test_suite.py` – correr todos los tests
+- [x] `scripts/init_db.py` – levantar base de datos
+- [ ] `scripts/backup.py` – backup de datos
+- [ ] `scripts/restore.py` – restore desde backup
+- [x] `scripts/test_suite.py` – correr todos los tests
 
 ### Pruebas Integrales
 - Tests unitarios por módulo

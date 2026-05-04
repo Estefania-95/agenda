@@ -5,6 +5,7 @@ Pruebas de búsquedas avanzadas y filtros.
 
 import sys
 import os
+import pytest
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 
@@ -83,8 +84,8 @@ def test_buscar_personas_con_filtro_nombre(mock_db_crud):
 
         assert resultado['total'] == 1
         # Verificar que listar_personas recibió el filtro correctamente
-        args, _ = mock_list.call_args
-        assert args[1]['nombre'] == "Juan"  # **kwargs
+        _, kwargs = mock_list.call_args
+        assert kwargs['nombre'] == "Juan"
 
 
 def test_buscar_personas_paginacion(mock_db_crud):

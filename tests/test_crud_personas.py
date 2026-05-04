@@ -172,7 +172,7 @@ def test_actualizar_persona_exito(mock_db_connection):
         mock_cursor.execute.assert_called_once()
         args, _ = mock_cursor.execute.call_args
         # Verificar que los parámetros incluyen los nuevos valores
-        assert "Juan Carlos" in args[0]
+        assert "Juan Carlos" in args[1]
         mock_db_connection.commit.assert_called_once()
 
 
@@ -238,7 +238,7 @@ def test_listar_personas_con_filtro_nombre(mock_db_connection):
 
         # Verificar que la query contiene LIKE %Juan%
         args, _ = mock_cursor.execute.call_args
-        assert "%Juan%" in args[0]
+        assert "%Juan%" in args[1]
 
 
 def test_listar_personas_paginacion(mock_db_connection):

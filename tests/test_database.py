@@ -6,6 +6,7 @@ Pruebas de conexión y funciones auxiliares.
 import sys
 import os
 import pytest
+import pyodbc
 from unittest.mock import patch, MagicMock
 
 # Añadir directorio src al path
@@ -13,7 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from src.database import (
     conectar_db,
-    test_connection,
+    test_connection as db_test_connection,
     ejecutar_query,
     ejecutar_non_query,
     DatabaseConnectionError,
@@ -76,7 +77,7 @@ def test_build_connection_string_faltan_vars():
 
 def test_build_connection_string_driver_personalizado(mock_env_vars):
     """Test: uso de driver personalizado desde variable de entorno."""
-    mock_env_vars['DB_DRIVER'] = 'ODBC Driver 18 for SQL Server'
+    os.environ['DB_DRIVER'] = 'ODBC Driver 18 for SQL Server'
 
     with patch('src.database.load_dotenv'):
         conn_str = _build_connection_string()
@@ -112,7 +113,7 @@ def test_test_connection_exito(mock_env_vars, mock_pyodbc_connect):
     """Test: prueba de conexión exitosa."""
     with patch('src.database.load_dotenv'), \
          patch('pyodbc.connect', return_value=mock_pyodbc_connect):
-        result = test_connection()
+        result = db_test_connection()
 
         assert result['success'] is True
         assert 'timestamp' in result
@@ -124,7 +125,7 @@ def test_test_connection_error(mock_env_vars):
     with patch('src.database.load_dotenv'), \
          patch('pyodbc.connect', side_effect=pyodbc.Error("Servidor no encontrado")):
         with pytest.raises(DatabaseConnectionError):
-            test_connection()
+            db_test_connection()
 
 
 # ==============================================

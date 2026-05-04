@@ -10,8 +10,8 @@ Sistema de Gestión Modular con SQL Server y Python. Metodología por fases estr
 - Cada fase tiene: spec.md (especificaciones) + progress.md (checklist)
 - Marcar tareas en progress.md al completarlas
 
-### 2. Fase 3 Actual (Estado: Implementando)
-**Objetivo**: Búsqueda avanzada y generación de reportes con exportación
+### 2. Fase 4 Actual (Estado: Implementando Interfaz)
+**Objetivo**: Desarrollar interfaz de consola (CLI) para interacción del usuario.
 
 **Archivos críticos**:
 - `src/buscador.py` - Funciones de búsqueda (YA CREADO)
