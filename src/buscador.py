@@ -7,8 +7,8 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 
 # Módulos propios
-from src.database import conectar_db, DatabaseConnectionError
-from src.crud_personas import listar_personas, contar_personas
+from database import conectar_db, DatabaseConnectionError
+from crud_personas import listar_personas, contar_personas
 
 # Re-exportar funciones principales para compatibilidad
 __all__ = [

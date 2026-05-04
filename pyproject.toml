@@ -53,13 +53,13 @@ all = [
 gestion-cli = "gestion_cli.main:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --tb=short"
-pythonpath = ["src"]
+pythonpath = ["."]
 markers = [
     "integration: marks tests as integration (requires real DB)"
 ]

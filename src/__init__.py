@@ -2,10 +2,10 @@
 # Organización de módulos por fases
 
 # Fase 1: Database
-from src.database import conectar_db, test_connection, DatabaseConnectionError
+from database import conectar_db, test_connection, DatabaseConnectionError
 
 # Fase 2: CRUD
-from src.crud_personas import (
+from crud_personas import (
     crear_persona,
     obtener_persona,
     actualizar_persona,
@@ -19,7 +19,7 @@ from src.crud_personas import (
 )
 
 # Fase 3: Búsqueda y Reportes
-from src.buscador import (
+from buscador import (
     buscar_personas,
     buscar_por_cuil,
     buscar_por_nombre,
@@ -29,7 +29,7 @@ from src.buscador import (
     sugerir_busqueda
 )
 
-from src.reportes import (
+from reportes import (
     reporte_personas_por_fecha,
     reporte_duplicados_cuil,
     reporte_estadisticas_generales,
@@ -37,7 +37,7 @@ from src.reportes import (
     generar_reporte_completo
 )
 
-from src.exportadores import (
+from exportadores import (
     exportar_a_csv,
     exportar_a_xlsx,
     exportar_a_json,

@@ -8,9 +8,9 @@ from prompt_toolkit.shortcuts import radiolist_dialog, message_dialog, input_dia
 from prompt_toolkit.styles import Style
 
 # Módulos propios
-from src.vistas import mostrar_encabezado, mostrar_mensaje, mostrar_tabla_personas, limpiar_pantalla
-from src.formularios import solicitar_datos_persona, confirmar_accion
-from src.crud_personas import (
+from vistas import mostrar_encabezado, mostrar_mensaje, mostrar_tabla_personas, limpiar_pantalla
+from formularios import solicitar_datos_persona, confirmar_accion
+from crud_personas import (
     crear_persona, 
     obtener_persona, 
     actualizar_persona, 
@@ -18,9 +18,9 @@ from src.crud_personas import (
     ValidacionError,
     DuplicadoError
 )
-from src.buscador import buscar_personas, busqueda_avanzada
-from src.reportes import reporte_estadisticas_generales
-from src.exportadores import exportar_a_csv, exportar_a_xlsx, exportar_a_json, exportar_a_pdf
+from buscador import buscar_personas, busqueda_avanzada
+from reportes import reporte_estadisticas_generales
+from exportadores import exportar_a_csv, exportar_a_xlsx, exportar_a_json, exportar_a_pdf
 
 # Estilo personalizado para prompt_toolkit
 style = Style.from_dict({
@@ -41,30 +41,27 @@ def menu_principal():
             title="Menú Principal",
             text="Seleccione una operación:",
             values=[
-                ('1', '1. Alta de Persona'),
-                ('2', '2. Listar / Buscar Personas'),
-                ('3', '3. Modificar Persona'),
-                ('4', '4. Baja de Persona'),
-                ('5', '5. Reportes Estadísticos'),
-                ('6', '6. Exportar Datos'),
-                ('0', '0. Salir')
+                ('1', '1. Listar'),
+                ('2', '2. Nuevo'),
+                ('3', '3. Modificar'),
+                ('4', '4. Buscar'),
+                ('5', '5. Eliminar'),
+                ('6', '6. Salir')
             ],
             style=style
         ).run()
 
         if opcion == '1':
-            pantalla_alta()
+            pantalla_listado()
         elif opcion == '2':
-            pantalla_busqueda()
+            pantalla_alta()
         elif opcion == '3':
             pantalla_modificacion()
         elif opcion == '4':
-            pantalla_baja()
+            pantalla_busqueda_especifica()
         elif opcion == '5':
-            pantalla_reportes()
-        elif opcion == '6':
-            pantalla_exportacion()
-        elif opcion == '0' or opcion is None:
+            pantalla_baja()
+        elif opcion == '6' or opcion is None:
             if confirmar_accion("¿Está seguro que desea salir?"):
                 break
 
@@ -87,25 +84,37 @@ def pantalla_alta():
     
     input("\nPresione Enter para continuar...")
 
-def pantalla_busqueda():
-    """Pantalla para listar y buscar personas."""
+def pantalla_listado():
+    """Pantalla para listar todos los registros."""
     limpiar_pantalla()
-    mostrar_encabezado("LISTADO Y BÚSQUEDA")
-    
-    termino = input("Término de búsqueda (deje vacío para ver todos): ").strip()
+    mostrar_encabezado("LISTADO DE PERSONAS")
     
     try:
-        if termino:
-            resultados = busqueda_avanzada(termino)
-            total = len(resultados)
-        else:
-            resp = buscar_personas(limit=50)
-            resultados = resp['resultados']
-            total = resp['total']
+        resp = buscar_personas(limit=100)
+        resultados = resp['resultados']
+        total = resp['total']
         
-        mostrar_tabla_personas(resultados, titulo=f"Resultados ({total})")
+        mostrar_tabla_personas(resultados, titulo=f"Mostrando {len(resultados)} de {total} registros")
     except Exception as e:
-        mostrar_mensaje(f"Error al buscar: {e}", "error")
+        mostrar_mensaje(f"Error al listar: {e}", "error")
+    
+    input("\nPresione Enter para continuar...")
+
+def pantalla_busqueda_especifica():
+    """Pantalla para buscar personas por filtros."""
+    limpiar_pantalla()
+    mostrar_encabezado("BUSCAR PERSONA")
+    
+    termino = input("Ingrese término de búsqueda (Nombre, Apellido o CUIL): ").strip()
+    
+    if termino:
+        try:
+            resultados = busqueda_avanzada(termino)
+            mostrar_tabla_personas(resultados, titulo=f"Resultados para: '{termino}'")
+        except Exception as e:
+            mostrar_mensaje(f"Error al buscar: {e}", "error")
+    else:
+        mostrar_mensaje("Operación cancelada: término vacío.", "alerta")
     
     input("\nPresione Enter para continuar...")
 
@@ -141,7 +150,7 @@ def pantalla_modificacion():
 def pantalla_baja():
     """Pantalla para eliminar una persona."""
     limpiar_pantalla()
-    mostrar_encabezado("BAJA DE PERSONA")
+    mostrar_encabezado("ELIMINAR PERSONA")
     
     persona_id_str = input("Ingrese el ID de la persona a eliminar: ").strip()
     if persona_id_str.isdigit():

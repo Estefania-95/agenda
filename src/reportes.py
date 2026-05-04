@@ -8,8 +8,8 @@ from typing import List, Dict, Any, Optional
 from collections import Counter
 
 # Módulos propios
-from src.database import conectar_db, DatabaseConnectionError
-from src.crud_personas import listar_personas, contar_personas
+from database import conectar_db, DatabaseConnectionError
+from crud_personas import listar_personas, contar_personas
 
 
 def reporte_personas_por_fecha(

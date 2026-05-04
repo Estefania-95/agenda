@@ -5,7 +5,7 @@ Módulo de formularios y validaciones de entrada - Fase 4.
 import re
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator, ValidationError
-from src.vistas import mostrar_mensaje
+from vistas import mostrar_mensaje
 
 class CuilValidator(Validator):
     """Validador para formato CUIL: XX-XXXXXXXX-X"""

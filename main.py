@@ -6,14 +6,16 @@ import sys
 import os
 from dotenv import load_dotenv
 
-# Asegurar que el directorio 'src' esté en el path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
+# Asegurar que tanto la raíz como 'src' estén en el path para máxima compatibilidad
+root_dir = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, root_dir)
+sys.path.insert(0, os.path.join(root_dir, 'src'))
 
 # Cargar variables de entorno
 load_dotenv()
 
-from src.menu_principal import menu_principal
-from src.vistas import mostrar_mensaje, limpiar_pantalla
+from menu_principal import menu_principal
+from vistas import mostrar_mensaje, limpiar_pantalla
 
 def check_dependencies():
     """Verifica que las librerías necesarias estén instaladas."""

@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 
 # Módulos propios
-from src.database import DatabaseConnectionError
+from database import DatabaseConnectionError
 
 # Placeholders para permitir patching en tests (sin importar librerías pesadas al cargar el módulo)
 pandas = None  # será un módulo cuando esté disponible

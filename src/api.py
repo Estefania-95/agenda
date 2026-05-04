@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 # Módulos del proyecto
-from src.crud_personas import (
+from crud_personas import (
     crear_persona, 
     obtener_persona, 
     actualizar_persona, 
@@ -20,9 +20,9 @@ from src.crud_personas import (
     ValidacionError,
     DuplicadoError
 )
-from src.buscador import buscar_personas, busqueda_avanzada
-from src.reportes import reporte_estadisticas_generales
-from src.exportadores import obtener_exportador
+from buscador import buscar_personas, busqueda_avanzada
+from reportes import reporte_estadisticas_generales
+from exportadores import obtener_exportador
 
 app = FastAPI(
     title="Agenda API",

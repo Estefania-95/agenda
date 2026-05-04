@@ -10,7 +10,7 @@ from typing import Optional, Dict, List, Any
 from datetime import datetime
 
 # Módulos propios
-from src.database import conectar_db, DatabaseConnectionError
+from database import conectar_db, DatabaseConnectionError
 
 # Configurar logging
 logger = logging.getLogger(__name__)
